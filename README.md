@@ -4,8 +4,9 @@ Repository for learning about apis in go
 ## Folder Structure
 * **Folder structure template:** `github.com/golang-standards/project-layoutgit`
 
-## Configs
-### packages
+## Packages
 * **viper:** `github.com/spf13/viper`
 * **jwtAuth:** `github.com/go-chi/jwtauth`
+* **bcrypt:** `golang.org/x/crypto/bcrypt`
+* **uuid:** `github.com/google/uuid`
 
