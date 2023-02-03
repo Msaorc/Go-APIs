@@ -11,37 +11,35 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestCreateNewProduct(t *testing.T) {
+func CreateTableAndBD() *Product {
 	db, err := gorm.Open(sqlite.Open("file:memory.db"))
 	if err != nil {
-		t.Error(err)
+		panic(err)
 	}
 	db.Migrator().DropTable(entity.Product{})
 	db.AutoMigrate(&entity.Product{})
-	product, err := entity.NewProduct("notebook", 16000.00)
-	assert.Nil(t, err)
 	productDB := NewProduct(db)
+	return productDB
+}
+
+func TestCreateNewProduct(t *testing.T) {
+	productDB := CreateTableAndBD()
+	product, err := entity.NewProduct("notebook", 10000.00)
+	assert.Nil(t, err)
 	err = productDB.Create(product)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, product.ID)
 	assert.Equal(t, "notebook", product.Name)
-	assert.Equal(t, 16000.00, product.Price)
+	assert.Equal(t, 10000.00, product.Price)
 }
 
 func TestFindAllProducts(t *testing.T) {
-	db, err := gorm.Open(sqlite.Open("file:memory.db"))
-	if err != nil {
-		t.Error(err)
-	}
-	db.Migrator().DropTable(entity.Product{})
-	db.AutoMigrate(&entity.Product{})
+	productDB := CreateTableAndBD()
 	for i := 1; i < 24; i++ {
 		product, err := entity.NewProduct(fmt.Sprintf("Product %d", i), rand.Float64()*100)
 		assert.Nil(t, err)
-		productDB := NewProduct(db)
 		productDB.Create(product)
 	}
-	productDB := NewProduct(db)
 	products, err := productDB.FindAll(1, 10, "asc")
 	assert.Nil(t, err)
 	assert.Len(t, products, 10)
@@ -62,15 +60,9 @@ func TestFindAllProducts(t *testing.T) {
 }
 
 func TestFindProductByID(t *testing.T) {
-	db, err := gorm.Open(sqlite.Open("file:memory.db"))
-	if err != nil {
-		t.Error(err)
-	}
-	db.Migrator().DropTable(entity.Product{})
-	db.AutoMigrate(&entity.Product{})
+	productDB := CreateTableAndBD()
 	product, err := entity.NewProduct("notebook", 16000.00)
 	assert.Nil(t, err)
-	productDB := NewProduct(db)
 	productDB.Create(product)
 	product, err = productDB.FindByID(product.ID.String())
 	assert.Nil(t, err)
@@ -80,15 +72,9 @@ func TestFindProductByID(t *testing.T) {
 }
 
 func TestUpdateProduct(t *testing.T) {
-	db, err := gorm.Open(sqlite.Open("file:memory.db"))
-	if err != nil {
-		t.Error(err)
-	}
-	db.Migrator().DropTable(entity.Product{})
-	db.AutoMigrate(&entity.Product{})
+	productDB := CreateTableAndBD()
 	product, err := entity.NewProduct("notebook", 16000.00)
 	assert.Nil(t, err)
-	productDB := NewProduct(db)
 	productDB.Create(product)
 	product.Name = "Notebook Dell"
 	assert.NotNil(t, product.ID)
@@ -97,4 +83,15 @@ func TestUpdateProduct(t *testing.T) {
 	product, err = productDB.FindByID(product.ID.String())
 	assert.Nil(t, err)
 	assert.Equal(t, "Notebook Dell", product.Name)
+}
+
+func TestDeleteProduct(t *testing.T) {
+	productDB := CreateTableAndBD()
+	product, err := entity.NewProduct("notebook", 16000.00)
+	assert.Nil(t, err)
+	productDB.Create(product)
+	err = productDB.Delete(product.ID.String())
+	assert.Nil(t, err)
+	_, err = productDB.FindByID(product.ID.String())
+	assert.Error(t, err)
 }
