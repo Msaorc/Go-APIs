@@ -14,6 +14,7 @@ func TestCreateUser(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	db.Migrator().DropTable(entity.User{})
 	db.AutoMigrate(&entity.User{})
 	user, _ := entity.NewUser("Marcos Augusto", "marcos@email.com", "1234567")
 	userDB := NewUser(db)
@@ -34,6 +35,7 @@ func TestFindByEmail(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	db.Migrator().DropTable(entity.User{})
 	db.AutoMigrate(&entity.User{})
 	user, _ := entity.NewUser("Teste User Find Email", "findemail@email.com", "1234567")
 	userDB := NewUser(db)
