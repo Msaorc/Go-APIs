@@ -22,8 +22,10 @@ func main() {
 		panic(err)
 	}
 	db.AutoMigrate(&entity.User{}, &entity.Product{})
-
-	http.ListenAndServe(":8081", nil)
+	productHandler := NewProductHandler(database.NewProduct(db))
+	mux := http.NewServeMux()
+	mux.HandleFunc("/products", productHandler.CreateProduct)
+	http.ListenAndServe(":8081", mux)
 }
 
 type ProductHandler struct {

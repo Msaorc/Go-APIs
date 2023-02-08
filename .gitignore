@@ -1,3 +1,4 @@
 .env
-memory.db
 .vscode
+api.http
+*.db
