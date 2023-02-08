@@ -5,8 +5,8 @@ import (
 
 	"github.com/Msaorc/Go-APIs/configs"
 	"github.com/Msaorc/Go-APIs/internal/entity"
-	"github.com/Msaorc/Go-APIs/internal/handlers"
 	"github.com/Msaorc/Go-APIs/internal/infra/database"
+	"github.com/Msaorc/Go-APIs/internal/webserver/handlers"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
