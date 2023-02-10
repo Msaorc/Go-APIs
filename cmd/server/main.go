@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 
-	"github.com/Msaorc/Go-APIs/configs"
 	"github.com/Msaorc/Go-APIs/internal/entity"
 	"github.com/Msaorc/Go-APIs/internal/infra/database"
 	"github.com/Msaorc/Go-APIs/internal/webserver/handlers"
@@ -12,10 +11,10 @@ import (
 )
 
 func main() {
-	_, err := configs.LoadConfigs(".")
-	if err != nil {
-		panic(err)
-	}
+	// _, err := configs.LoadConfigs(".")
+	// if err != nil {
+	// 	panic(err)
+	// }
 	db, err := gorm.Open(sqlite.Open("file:APIgo.db"), &gorm.Config{})
 	if err != nil {
 		panic(err)
