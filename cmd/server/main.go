@@ -3,25 +3,27 @@ package main
 import (
 	"net/http"
 
+	"github.com/Msaorc/Go-APIs/configs"
 	"github.com/Msaorc/Go-APIs/internal/entity"
 	"github.com/Msaorc/Go-APIs/internal/infra/database"
 	"github.com/Msaorc/Go-APIs/internal/webserver/handlers"
+	"github.com/go-chi/chi/v5"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func main() {
-	// _, err := configs.LoadConfigs(".")
-	// if err != nil {
-	// 	panic(err)
-	// }
+	_, err := configs.LoadConfigs(".")
+	if err != nil {
+		panic(err)
+	}
 	db, err := gorm.Open(sqlite.Open("file:APIgo.db"), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 	db.AutoMigrate(&entity.User{}, &entity.Product{})
 	productHandler := handlers.NewProductHandler(database.NewProduct(db))
-	mux := http.NewServeMux()
-	mux.HandleFunc("/products", productHandler.CreateProduct)
-	http.ListenAndServe(":8081", mux)
+	routers := chi.NewRouter()
+	routers.Post("/products", productHandler.CreateProduct)
+	http.ListenAndServe(":8081", routers)
 }
