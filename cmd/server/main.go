@@ -24,8 +24,10 @@ func main() {
 	}
 	db.AutoMigrate(&entity.User{}, &entity.Product{})
 	productHandler := handlers.NewProductHandler(database.NewProduct(db))
-	routers := chi.NewRouter()
-	routers.Use(middleware.Logger)
-	routers.Post("/products", productHandler.CreateProduct)
-	http.ListenAndServe(":8081", routers)
+	mux := chi.NewRouter()
+	mux.Use(middleware.Logger)
+	mux.Post("/products", productHandler.CreateProduct)
+	mux.Get("/products/{id}", productHandler.GetProduct)
+	mux.Put("/products/{id}", productHandler.UpdateProduct)
+	http.ListenAndServe(":8081", mux)
 }
