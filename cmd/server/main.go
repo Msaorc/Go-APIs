@@ -8,6 +8,7 @@ import (
 	"github.com/Msaorc/Go-APIs/internal/infra/database"
 	"github.com/Msaorc/Go-APIs/internal/webserver/handlers"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -24,6 +25,7 @@ func main() {
 	db.AutoMigrate(&entity.User{}, &entity.Product{})
 	productHandler := handlers.NewProductHandler(database.NewProduct(db))
 	routers := chi.NewRouter()
+	routers.Use(middleware.Logger)
 	routers.Post("/products", productHandler.CreateProduct)
 	http.ListenAndServe(":8081", routers)
 }
