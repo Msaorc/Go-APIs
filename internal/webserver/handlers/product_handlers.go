@@ -49,7 +49,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	p, err := h.ProductDB.FindByID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 	json.NewEncoder(w).Encode(p)
@@ -78,6 +78,25 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = h.ProductDB.Update(&product)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	_, err := h.ProductDB.FindByID(id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	err = h.ProductDB.Delete(id)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
