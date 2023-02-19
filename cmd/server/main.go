@@ -29,5 +29,6 @@ func main() {
 	mux.Post("/products", productHandler.CreateProduct)
 	mux.Get("/products/{id}", productHandler.GetProduct)
 	mux.Put("/products/{id}", productHandler.UpdateProduct)
+	mux.Delete("/products/{id}", productHandler.DeleteProduct)
 	http.ListenAndServe(":8081", mux)
 }
