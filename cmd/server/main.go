@@ -26,6 +26,7 @@ func main() {
 	productHandler := handlers.NewProductHandler(database.NewProduct(db))
 	mux := chi.NewRouter()
 	mux.Use(middleware.Logger)
+	mux.Get("/products", productHandler.FindAllProducts)
 	mux.Post("/products", productHandler.CreateProduct)
 	mux.Get("/products/{id}", productHandler.GetProduct)
 	mux.Put("/products/{id}", productHandler.UpdateProduct)

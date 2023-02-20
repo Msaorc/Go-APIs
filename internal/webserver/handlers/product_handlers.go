@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/Msaorc/Go-APIs/internal/dto"
 	"github.com/Msaorc/Go-APIs/internal/entity"
@@ -52,6 +53,8 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
 }
 
@@ -83,6 +86,30 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *ProductHandler) FindAllProducts(w http.ResponseWriter, r *http.Request) {
+	page := r.URL.Query().Get("page")
+	limit := r.URL.Query().Get("limit")
+	sort := r.URL.Query().Get("sort")
+
+	pageint, err := strconv.Atoi(page)
+	if err != nil {
+		pageint = 0
+	}
+	limitint, err := strconv.Atoi(limit)
+	if err != nil {
+		limitint = 0
+	}
+
+	products, err := h.ProductDB.FindAll(pageint, limitint, sort)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(products)
 }
 
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
