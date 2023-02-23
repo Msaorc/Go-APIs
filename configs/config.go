@@ -33,6 +33,6 @@ func LoadConfigs(path string) (*conf, error) {
 	if err != nil {
 		panic(err)
 	}
-	cfg.TokenAuth = jwtauth.New("H256", []byte(cfg.JwtSecret), nil)
+	cfg.TokenAuth = jwtauth.New("HS256", []byte(cfg.JwtSecret), nil)
 	return cfg, nil
 }
