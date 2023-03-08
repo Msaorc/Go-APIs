@@ -9,6 +9,7 @@ import (
 	"github.com/Msaorc/Go-APIs/internal/webserver/handlers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/jwtauth"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -27,11 +28,17 @@ func main() {
 	userHandle := handlers.NewUserHandler(database.NewUser(db), configs.TokenAuth, configs.JwtExperesIn)
 	mux := chi.NewRouter()
 	mux.Use(middleware.Logger)
-	mux.Get("/products", productHandler.FindAllProducts)
-	mux.Post("/products", productHandler.CreateProduct)
-	mux.Get("/products/{id}", productHandler.GetProduct)
-	mux.Put("/products/{id}", productHandler.UpdateProduct)
-	mux.Delete("/products/{id}", productHandler.DeleteProduct)
+
+	mux.Route("/products", func(r chi.Router) {
+		r.Use(jwtauth.Verifier(configs.TokenAuth))
+		r.Use(jwtauth.Authenticator)
+		r.Get("/", productHandler.FindAllProducts)
+		r.Post("/", productHandler.CreateProduct)
+		r.Get("/{id}", productHandler.GetProduct)
+		r.Put("/{id}", productHandler.UpdateProduct)
+		r.Delete("/{id}", productHandler.DeleteProduct)
+	})
+
 	mux.Post("/users", userHandle.CreateUser)
 	mux.Post("/users/authenticate", userHandle.Authentication)
 	http.ListenAndServe(":8081", mux)
