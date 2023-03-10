@@ -12,3 +12,5 @@ Repository for learning about apis in go
 * **assert:** `github.com/stretchr/testify/assert`
 * **gorm:** `gorm.io/gorm`
 * **driver/sqlite:** `"gorm.io/driver/sqlite"`
+* **go-chi** `github.com/go-chi/chi/`
+* **gorm** `gorm.io/gorm`
