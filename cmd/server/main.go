@@ -25,9 +25,12 @@ func main() {
 	}
 	db.AutoMigrate(&entity.User{}, &entity.Product{})
 	productHandler := handlers.NewProductHandler(database.NewProduct(db))
-	userHandle := handlers.NewUserHandler(database.NewUser(db), configs.TokenAuth, configs.JwtExperesIn)
+	userHandle := handlers.NewUserHandler(database.NewUser(db))
 	mux := chi.NewRouter()
 	mux.Use(middleware.Logger)
+	mux.Use(middleware.Recoverer)
+	mux.Use(middleware.WithValue("jwt", configs.TokenAuth))
+	mux.Use(middleware.WithValue("experesIn", configs.JwtExperesIn))
 
 	mux.Route("/products", func(r chi.Router) {
 		r.Use(jwtauth.Verifier(configs.TokenAuth))
