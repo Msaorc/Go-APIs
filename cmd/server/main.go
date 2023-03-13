@@ -4,12 +4,14 @@ import (
 	"net/http"
 
 	"github.com/Msaorc/Go-APIs/configs"
+	_ "github.com/Msaorc/Go-APIs/docs"
 	"github.com/Msaorc/Go-APIs/internal/entity"
 	"github.com/Msaorc/Go-APIs/internal/infra/database"
 	"github.com/Msaorc/Go-APIs/internal/webserver/handlers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/jwtauth"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -62,5 +64,6 @@ func main() {
 
 	mux.Post("/users", userHandle.CreateUser)
 	mux.Post("/users/authenticate", userHandle.Authentication)
+	mux.Get("/docs/*", httpSwagger.Handler(httpSwagger.URL("http://localhost:8081/docs/doc.json")))
 	http.ListenAndServe(":8081", mux)
 }

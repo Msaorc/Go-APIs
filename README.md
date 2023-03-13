@@ -14,4 +14,4 @@ Repository for learning about apis in go
 * **driver/sqlite:** `"gorm.io/driver/sqlite"`
 * **go-chi** `github.com/go-chi/chi/`
 * **gorm** `gorm.io/gorm`
-* **swag** `github.com/swaggo/swag/cmd/swag@latest`
+* **swag** `github.com/swaggo/swag`

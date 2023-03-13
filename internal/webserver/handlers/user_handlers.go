@@ -15,6 +15,10 @@ type UserHandler struct {
 	UserDB database.UserInterface
 }
 
+type Error struct {
+	Message string `json:"message"`
+}
+
 func NewUserHandler(userDB database.UserInterface) *UserHandler {
 	return &UserHandler{
 		UserDB: userDB,
@@ -56,6 +60,16 @@ func (uh *UserHandler) Authentication(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(accessToken)
 }
 
+// Create user godoc
+// @Summary      Create User
+// @Description  Create User
+// @Tags         users
+// @Accept       json
+// @Produce      json
+// @Param        request   body      dto.CreateUserInput  true  "user request"
+// @Success      201
+// @Failure      500  {object}  Error
+// @Router       /users [post]
 func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user dto.CreateUserInput
 	err := json.NewDecoder(r.Body).Decode(&user)
@@ -65,12 +79,18 @@ func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	u, err := entity.NewUser(user.Name, user.Email, user.Password)
 	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
+		errorMessage := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	err = uh.UserDB.Create(u)
 	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
+		errorMessage := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
