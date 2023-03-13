@@ -1,0 +1,28 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Product API with authentication.",
+        "title": "Go Expert API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Marcos Augusto",
+            "url": "http://www.m\u0026asystem.com.br",
+            "email": "msaorc@hotmail.com"
+        },
+        "license": {
+            "name": "M\u0026A System",
+            "url": "http://www.m\u0026asystem.com.br"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8081",
+    "basePath": "/",
+    "paths": {},
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

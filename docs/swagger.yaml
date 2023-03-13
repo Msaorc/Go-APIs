@@ -1,0 +1,21 @@
+basePath: /
+host: localhost:8081
+info:
+  contact:
+    email: msaorc@hotmail.com
+    name: Marcos Augusto
+    url: http://www.m&asystem.com.br
+  description: Product API with authentication.
+  license:
+    name: M&A System
+    url: http://www.m&asystem.com.br
+  termsOfService: http://swagger.io/terms/
+  title: Go Expert API
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -14,6 +14,24 @@ import (
 	"gorm.io/gorm"
 )
 
+// @title           Go Expert API
+// @version         1.0
+// @description     Product API with authentication.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   Marcos Augusto
+// @contact.url    http://www.m&asystem.com.br
+// @contact.email  msaorc@hotmail.com
+
+// @license.name  M&A System
+// @license.url   http://www.m&asystem.com.br
+
+// @host      localhost:8081
+// @BasePath  /
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	configs, err := configs.LoadConfigs(".")
 	if err != nil {
