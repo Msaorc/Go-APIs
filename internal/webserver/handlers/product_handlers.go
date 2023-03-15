@@ -22,26 +22,59 @@ func NewProductHandler(db database.ProductInterface) *ProductHandler {
 	}
 }
 
+// Create product godoc
+// @Summary      Create Product
+// @Description  Create Product
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param        request   body      dto.CreateProductInput  true  "product request"
+// @Success      201
+// @Failure      400  {object}  dto.Error
+// @Failure      500  {object}  dto.Error
+// @Router       /users/authenticate [post]
+// @Security ApiKeyAuth
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var product dto.CreateProductInput
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
+		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	p, err := entity.NewProduct(product.Name, product.Price)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	err = h.ProductDB.Create(p)
 	if err != nil {
+		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
 }
 
+// Get product godoc
+// @Summary      Get Product
+// @Description  Get Product
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param        request   body      dto.CreateProductInput  true  "product request"
+// @Success      200  {object}  entity.Product
+// @Failure      400  {object}  dto.Error
+// @Failure      500  {object}  dto.Error
+// @Router       /users/authenticate [post]
+// @Security ApiKeyAuth
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -58,6 +91,18 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
+// Create product godoc
+// @Summary      Create Product
+// @Description  Create Product
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param        request   body      dto.CreateProductInput  true  "product request"
+// @Success      201
+// @Failure      400  {object}  dto.Error
+// @Failure      500  {object}  dto.Error
+// @Router       /users/authenticate [post]
+// @Security ApiKeyAuth
 func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
@@ -88,6 +133,19 @@ func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Get All godoc
+// @Summary      Get All Product
+// @Description  Get All Product
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param        page    query    string   false  "page number"
+// @Param        limit   query    string   false   "limit"
+// @Success      200     {array}  entity.Product
+// @Failure      404  {object}  dto.Error
+// @Failure      500  {object}  dto.Error
+// @Router       /products [get]
+// @Security ApiKeyAuth
 func (h *ProductHandler) FindAllProducts(w http.ResponseWriter, r *http.Request) {
 	page := r.URL.Query().Get("page")
 	limit := r.URL.Query().Get("limit")
@@ -104,7 +162,10 @@ func (h *ProductHandler) FindAllProducts(w http.ResponseWriter, r *http.Request)
 
 	products, err := h.ProductDB.FindAll(pageint, limitint, sort)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	w.Header().Set("Content-type", "application/json")
@@ -112,6 +173,18 @@ func (h *ProductHandler) FindAllProducts(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(products)
 }
 
+// Create product godoc
+// @Summary      Create Product
+// @Description  Create Product
+// @Tags         Products
+// @Accept       json
+// @Produce      json
+// @Param        request   body      dto.CreateProductInput  true  "product request"
+// @Success      201
+// @Failure      400  {object}  dto.Error
+// @Failure      500  {object}  dto.Error
+// @Router       /users/authenticate [post]
+// @Security ApiKeyAuth
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {

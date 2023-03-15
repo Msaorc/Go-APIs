@@ -15,10 +15,6 @@ type UserHandler struct {
 	UserDB database.UserInterface
 }
 
-type Error struct {
-	Message string `json:"message"`
-}
-
 func NewUserHandler(userDB database.UserInterface) *UserHandler {
 	return &UserHandler{
 		UserDB: userDB,
@@ -31,12 +27,12 @@ func NewUserHandler(userDB database.UserInterface) *UserHandler {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @Param        request   body      dto.AuthenticationUserInput  true  "user request"
+// @Param        request   body      dto.AuthenticationUserInput  true  "authenticate request"
 // @Success      200  {object}  dto.AuthenticationUserOutput
-// @Failure      400  {object}  Error
-// @Failure      401  {object}  Error
-// @Failure      404  {object}  Error
-// @Failure      500  {object}  Error
+// @Failure      400  {object}  dto.Error
+// @Failure      401  {object}  dto.Error
+// @Failure      404  {object}  dto.Error
+// @Failure      500  {object}  dto.Error
 // @Router       /users/authenticate [post]
 func (uh *UserHandler) Authentication(w http.ResponseWriter, r *http.Request) {
 	jwt := r.Context().Value("jwt").(*jwtauth.JWTAuth)
@@ -46,7 +42,7 @@ func (uh *UserHandler) Authentication(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		errorMessage := Error{Message: err.Error()}
+		errorMessage := dto.Error{Message: err.Error()}
 		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
@@ -54,14 +50,14 @@ func (uh *UserHandler) Authentication(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
-		errorMessage := Error{Message: err.Error()}
+		errorMessage := dto.Error{Message: err.Error()}
 		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	if !u.ValidatePassword(user.Password) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
-		errorMessage := Error{Message: err.Error()}
+		errorMessage := dto.Error{Message: err.Error()}
 		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
@@ -86,8 +82,8 @@ func (uh *UserHandler) Authentication(w http.ResponseWriter, r *http.Request) {
 // @Produce      json
 // @Param        request   body      dto.CreateUserInput  true  "user request"
 // @Success      201
-// @Failure      400  {object}  Error
-// @Failure      500  {object}  Error
+// @Failure      400  {object}  dto.Error
+// @Failure      500  {object}  dto.Error
 // @Router       /users [post]
 func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user dto.CreateUserInput
@@ -100,7 +96,7 @@ func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
-		errorMessage := Error{Message: err.Error()}
+		errorMessage := dto.Error{Message: err.Error()}
 		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
@@ -108,7 +104,7 @@ func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		errorMessage := Error{Message: err.Error()}
+		errorMessage := dto.Error{Message: err.Error()}
 		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}

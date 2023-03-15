@@ -12,6 +12,13 @@ definitions:
       access_token:
         type: string
     type: object
+  dto.CreateProductInput:
+    properties:
+      name:
+        type: string
+      price:
+        type: number
+    type: object
   dto.CreateUserInput:
     properties:
       email:
@@ -21,10 +28,21 @@ definitions:
       password:
         type: string
     type: object
-  handlers.Error:
+  dto.Error:
     properties:
       message:
         type: string
+    type: object
+  entity.Product:
+    properties:
+      create_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
     type: object
 host: localhost:8081
 info:
@@ -40,6 +58,42 @@ info:
   title: Go Expert API
   version: "1.0"
 paths:
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Get All Product
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Product'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Product
+      tags:
+      - Products
   /users:
     post:
       consumes:
@@ -60,11 +114,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handlers.Error'
+            $ref: '#/definitions/dto.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handlers.Error'
+            $ref: '#/definitions/dto.Error'
       summary: Create User
       tags:
       - Users
@@ -74,7 +128,7 @@ paths:
       - application/json
       description: Authenticate User
       parameters:
-      - description: user request
+      - description: authenticate request
         in: body
         name: request
         required: true
@@ -90,19 +144,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/handlers.Error'
+            $ref: '#/definitions/dto.Error'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/handlers.Error'
+            $ref: '#/definitions/dto.Error'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/handlers.Error'
+            $ref: '#/definitions/dto.Error'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/handlers.Error'
+            $ref: '#/definitions/dto.Error'
       summary: Authenticate User
       tags:
       - Users

@@ -19,3 +19,7 @@ type AuthenticationUserInput struct {
 type AuthenticationUserOutput struct {
 	AccessToken string `json:"access_token"`
 }
+
+type Error struct {
+	Message string `json:"message"`
+}
