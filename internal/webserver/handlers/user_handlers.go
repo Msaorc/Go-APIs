@@ -25,22 +25,44 @@ func NewUserHandler(userDB database.UserInterface) *UserHandler {
 	}
 }
 
+// Authenticate user godoc
+// @Summary      Authenticate User
+// @Description  Authenticate User
+// @Tags         Users
+// @Accept       json
+// @Produce      json
+// @Param        request   body      dto.AuthenticationUserInput  true  "user request"
+// @Success      200  {object}  dto.AuthenticationUserOutput
+// @Failure      400  {object}  Error
+// @Failure      401  {object}  Error
+// @Failure      404  {object}  Error
+// @Failure      500  {object}  Error
+// @Router       /users/authenticate [post]
 func (uh *UserHandler) Authentication(w http.ResponseWriter, r *http.Request) {
 	jwt := r.Context().Value("jwt").(*jwtauth.JWTAuth)
 	jwtExperiesIn := r.Context().Value("experesIn").(int)
 	var user dto.AuthenticationUserInput
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		w.WriteHeader(http.StatusBadGateway)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		errorMessage := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	u, err := uh.UserDB.FindByEmail(user.Email)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	if !u.ValidatePassword(user.Password) {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
+		errorMessage := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 
@@ -50,11 +72,7 @@ func (uh *UserHandler) Authentication(w http.ResponseWriter, r *http.Request) {
 		"name": u.Name,
 	})
 
-	accessToken := struct {
-		AccessToken string `json:"access_token"`
-	}{
-		AccessToken: tokenString,
-	}
+	accessToken := dto.AuthenticationUserOutput{AccessToken: tokenString}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(accessToken)
@@ -63,11 +81,12 @@ func (uh *UserHandler) Authentication(w http.ResponseWriter, r *http.Request) {
 // Create user godoc
 // @Summary      Create User
 // @Description  Create User
-// @Tags         users
+// @Tags         Users
 // @Accept       json
 // @Produce      json
 // @Param        request   body      dto.CreateUserInput  true  "user request"
 // @Success      201
+// @Failure      400  {object}  Error
 // @Failure      500  {object}  Error
 // @Router       /users [post]
 func (uh *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {

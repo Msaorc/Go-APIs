@@ -15,3 +15,7 @@ type AuthenticationUserInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type AuthenticationUserOutput struct {
+	AccessToken string `json:"access_token"`
+}
