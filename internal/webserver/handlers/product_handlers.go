@@ -32,14 +32,14 @@ func NewProductHandler(db database.ProductInterface) *ProductHandler {
 // @Success      201
 // @Failure      400  {object}  dto.Error
 // @Failure      500  {object}  dto.Error
-// @Router       /users/authenticate [post]
+// @Router       /products [post]
 // @Security ApiKeyAuth
 func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	var product dto.CreateProductInput
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
 		w.Header().Set("content-type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusNotFound)
 		errorMessage := dto.Error{Message: err.Error()}
 		json.NewEncoder(w).Encode(errorMessage)
 		return
@@ -69,21 +69,27 @@ func (h *ProductHandler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 // @Tags         Products
 // @Accept       json
 // @Produce      json
-// @Param        request   body      dto.CreateProductInput  true  "product request"
+// @Param        id   path      string  true  "product ID" Format(uuid)
 // @Success      200  {object}  entity.Product
-// @Failure      400  {object}  dto.Error
+// @Failure      404  {object}  dto.Error
 // @Failure      500  {object}  dto.Error
-// @Router       /users/authenticate [post]
+// @Router       /products/{id} [get]
 // @Security ApiKeyAuth
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := dto.Error{Message: "Id inválido"}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	p, err := h.ProductDB.FindByID(id)
 	if err != nil {
+		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	w.Header().Set("Content-type", "application/json")
@@ -91,43 +97,59 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
-// Create product godoc
-// @Summary      Create Product
-// @Description  Create Product
+// Update product godoc
+// @Summary      Update Product
+// @Description  Update Product
 // @Tags         Products
 // @Accept       json
 // @Produce      json
+// @Param        id   path      string  true  "product ID" Format(uuid)
 // @Param        request   body      dto.CreateProductInput  true  "product request"
 // @Success      201
-// @Failure      400  {object}  dto.Error
+// @Failure      404  {object}  dto.Error
 // @Failure      500  {object}  dto.Error
-// @Router       /users/authenticate [post]
+// @Router       /products/{id} [put]
 // @Security ApiKeyAuth
 func (h *ProductHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if id == "" {
-		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := dto.Error{Message: "Id inválido"}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	var product entity.Product
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	product.ID, err = entityPKG.ParseID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	_, err = h.ProductDB.FindByID(id)
 	if err != nil {
+		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	err = h.ProductDB.Update(&product)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		errorMessage := dto.Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -173,17 +195,17 @@ func (h *ProductHandler) FindAllProducts(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(products)
 }
 
-// Create product godoc
-// @Summary      Create Product
-// @Description  Create Product
+// Delete product godoc
+// @Summary      Delete Product
+// @Description  Delete Product
 // @Tags         Products
 // @Accept       json
 // @Produce      json
-// @Param        request   body      dto.CreateProductInput  true  "product request"
+// @Param        id   path      string  true  "product ID" Format(uuid)
 // @Success      201
-// @Failure      400  {object}  dto.Error
+// @Failure      404  {object}  dto.Error
 // @Failure      500  {object}  dto.Error
-// @Router       /users/authenticate [post]
+// @Router       /products/{id} [delete]
 // @Security ApiKeyAuth
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")

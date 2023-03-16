@@ -15,3 +15,6 @@ Repository for learning about apis in go
 * **go-chi** `github.com/go-chi/chi/`
 * **gorm** `gorm.io/gorm`
 * **swag** `github.com/swaggo/swag`
+
+## Docs
+* **Url:** `http://localhost:8081//docs/index.html`
