@@ -12,7 +12,8 @@ import (
 )
 
 func CreateTableProductAndBD() *Product {
-	db, err := gorm.Open(sqlite.Open("file:memory.db"))
+	db, err := gorm.Open(sqlite.Open("file::memory:"))
+	// db, err := gorm.Open(sqlite.Open("file:memory.db"))
 	if err != nil {
 		panic(err)
 	}
